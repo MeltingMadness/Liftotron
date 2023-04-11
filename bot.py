@@ -85,11 +85,12 @@ Körper formen sich.
 GN."""
     context.bot.send_message(chat_id=chat_id, text=poem)
     
-def mention_everyone(context):
-    chat_id = ("-1001854584771")
-    mention_text = " ".join([f"@{user}" for user in all_users])
-    message = f"Hey, es ist Sonntag! Zeit für den Check-In! {mention_text}"
-    context.bot.send_message(chat_id=chat_id, text=message)
+def mention_everyone(context: CallbackContext):
+    now = datetime.datetime.now(pytz.timezone("Europe/Berlin"))
+    if now.weekday() == 6 and now.hour == 12:  # Check if it's Sunday and 12:00
+        chat_id = ("-1001854584771")
+        mention_list = " ".join([f"@{user}" for user in all_users])
+        context.bot.send_message(chat_id=chat_id, text=f"Es ist Sonntag! Check-In nicht vergessen! {mention_list}")
 
     
 def lift_command(update: Update, context: CallbackContext):
@@ -124,7 +125,7 @@ def main():
     jq.run_daily(reset_gm_users, time=datetime.time(hour=0, tzinfo=timezone))
     jq.run_daily(check_all_gm_sent, time=datetime.time(hour=9, tzinfo=timezone))
     jq.run_daily(send_poem, time=datetime.time(hour=22, tzinfo=timezone))
-    jq.run_daily(mention_everyone, day=(6,), time=datetime.time(hour=12, tzinfo=timezone))
+    jq.run_repeating(mention_everyone, interval=datetime.timedelta(hours=1), first=datetime.time(hour=12, tzinfo=timezone))
     
     jq.start()
 
