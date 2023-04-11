@@ -95,14 +95,14 @@ def mention_everyone(context: CallbackContext):
     
 def lift_command(update: Update, context: CallbackContext):
     print("lift_command aufgerufen")  
-    if update.effective_chat.type in ['private', 'group', 'supergroup']:
-        chat_id = ("-1001854584771")
-        message_text = ' '.join(context.args)
-        print(f"message_text: {message_text}")  
-        if message_text:
-            context.bot.send_message(chat_id=chat_id, text=message_text)
-        else:
-            context.bot.send_message(chat_id=update.effective_chat.id, text="Bitte geben Sie eine Nachricht nach dem /lift Befehl ein.")
+    chat_id = ("-1001854584771")
+    message_text = ' '.join(context.args)
+    print(f"message_text: {message_text}")  
+    if message_text:
+        context.bot.send_message(chat_id=chat_id, text=message_text)
+    else:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Bitte geben Sie eine Nachricht nach dem /lift Befehl ein.")
+
 
 
 
