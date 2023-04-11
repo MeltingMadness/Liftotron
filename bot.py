@@ -146,7 +146,7 @@ def main():
     dp.add_error_handler(error_handler)
 
     updater.start_polling()
-    updater = Updater(api_token, use_context=True, workers=4)
+    # updater = Updater(api_token, use_context=True, workers=4)
     updater.idle()
 
 if __name__ == '__main__':
