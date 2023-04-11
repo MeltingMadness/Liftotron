@@ -34,6 +34,9 @@ def reset_gm_users(context):
 def send_gm(context):
     chat_id = ("-1001854584771")
     context.bot.send_message(chat_id=chat_id, text="GM")
+    gif_url = "https://media3.giphy.com/media/2IxtjutFAGLfdI1GvK/giphy.gif"
+    context.bot.send_animation(chat_id=chat_id, animation=gif_url)
+
 
 def error_handler(update: Update, context: CallbackContext):
     try:
@@ -67,6 +70,7 @@ def check_gm(update: Update, context: CallbackContext):
             gm_users[user_name] = True
 
 def check_all_gm_sent(context):
+    global all_users
     chat_id = ("-1001854584771")
     missing_users = all_users.difference(set(gm_users.keys()))
 
