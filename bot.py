@@ -84,6 +84,23 @@ Muskeln wachsen, Kraft erwacht,
 Körper formen sich.
 GN."""
     context.bot.send_message(chat_id=chat_id, text=poem)
+    
+def mention_everyone(context):
+    chat_id = ("-1001854584771")
+    mention_text = " ".join([f"@{user}" for user in all_users])
+    message = f"Hey, es ist Sonntag! Zeit für den Check-In! {mention_text}"
+    context.bot.send_message(chat_id=chat_id, text=message)
+
+    
+def lift_command(update: Update, context: CallbackContext):
+    if update.effective_chat.type == "private":
+        chat_id = ("-1001854584771")
+        text = " ".join(context.args)
+        if text:
+            context.bot.send_message(chat_id=chat_id, text=text)
+        else:
+            update.message.reply_text("Bitte füge Text zum /lift Befehl hinzu.")
+
 
 
 def main():
@@ -96,8 +113,8 @@ def main():
     dp.add_handler(CommandHandler("gm", gm_command))
     dp.add_handler(MessageHandler(Filters.text, check_gm))
     dp.add_error_handler(error_handler)
-
-
+    dp.add_handler(CommandHandler("lift", lift_command))
+    
     jq = JobQueue()
     jq.set_dispatcher(dp)
 
@@ -107,7 +124,8 @@ def main():
     jq.run_daily(reset_gm_users, time=datetime.time(hour=0, tzinfo=timezone))
     jq.run_daily(check_all_gm_sent, time=datetime.time(hour=9, tzinfo=timezone))
     jq.run_daily(send_poem, time=datetime.time(hour=22, tzinfo=timezone))
-
+    jq.run_daily(mention_everyone, day=(6,), time=datetime.time(hour=12, tzinfo=timezone))
+    
     jq.start()
 
     # Fetch group members
