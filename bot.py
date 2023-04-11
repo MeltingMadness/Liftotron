@@ -94,13 +94,14 @@ def mention_everyone(context: CallbackContext):
 
     
 def lift_command(update: Update, context: CallbackContext):
-    if update.effective_chat.type == "private":
+    if update.effective_chat.type == 'private':
         chat_id = ("-1001854584771")
-        text = " ".join(context.args)
-        if text:
-            context.bot.send_message(chat_id=chat_id, text=text)
+        message_text = ' '.join(context.args)
+        if message_text:
+            context.bot.send_message(chat_id=chat_id, text=message_text)
         else:
-            update.message.reply_text("Bitte füge Text zum /lift Befehl hinzu.")
+            context.bot.send_message(chat_id=update.effective_chat.id, text="Bitte geben Sie eine Nachricht nach dem /lift Befehl ein.")
+
 
 
 
@@ -136,6 +137,7 @@ def main():
     dp.add_handler(CommandHandler("start", start_command))
     dp.add_handler(CommandHandler("gm", gm_command))
     dp.add_handler(MessageHandler(Filters.text, check_gm))
+    dp.add_handler(CommandHandler("lift", lift_command))
 
     dp.add_error_handler(error_handler)
 
