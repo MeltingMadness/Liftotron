@@ -98,11 +98,11 @@ def mention_everyone(context: CallbackContext):
 
     
 def lift_command(update: Update, context: CallbackContext):
-    print("lift_command aufgerufen")  
+    print("lift_command aufgerufen")
     chat_id = ("-1001854584771")
-    message_text = ' '.join(context.args)
-    print(f"message_text: {message_text}") 
-    message_text = message_text.replace('\n', '  \n') 
+    message_text = update.message.text.partition(' ')[2]
+    print(f"message_text: {message_text}")
+    message_text = message_text.replace('\n', '  \n')
     if message_text:
         context.bot.send_message(chat_id=chat_id, text=message_text, parse_mode='Markdown')
     else:
