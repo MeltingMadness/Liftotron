@@ -116,10 +116,11 @@ def main():
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start_command))
+    dp.add_handler(CommandHandler("lift", lift_command))
     dp.add_handler(CommandHandler("gm", gm_command))
     dp.add_handler(MessageHandler(Filters.text, check_gm))
     dp.add_error_handler(error_handler)
-    dp.add_handler(CommandHandler("lift", lift_command))
+    
     
     jq = JobQueue()
     jq.set_dispatcher(dp)
