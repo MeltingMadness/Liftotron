@@ -162,8 +162,7 @@ def main():
     dp.add_handler(MessageHandler(Filters.text, check_gm))
     dp.add_error_handler(error_handler)
     
-    jq = JobQueue()
-    jq.set_dispatcher(dp)
+    jq = updater.job_queue
 
     # Zeitzone festlegen
     timezone = pytz.timezone('Europe/Berlin')
