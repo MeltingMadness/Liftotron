@@ -3,13 +3,14 @@ import os
 import random
 from collections import defaultdict
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext, JobQueue, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 from telegram.error import (TelegramError, Unauthorized, BadRequest, 
                             TimedOut, ChatMigrated, NetworkError)
 
 import pytz
 
 gm_users = defaultdict(bool)
+all_users = set()
 
 def fetch_group_members(bot, chat_id):
     all_members = set()
@@ -28,6 +29,7 @@ def fetch_group_members(bot, chat_id):
             break
 
     return all_members
+
 
 def reset_gm_users(context):
     gm_users.clear()
@@ -115,9 +117,10 @@ def quote_command1(update: Update, context: CallbackContext):
 I have found the Iron to be my greatest friend. 
 It never freaks out on me, never runs. 
 Friends may come and go. 
-
+    
 But two hundred pounds is always two hundred pounds."""
     context.bot.send_message(chat_id=chat_id, text=quote)
+
     
 def send_random_message(context: CallbackContext):
     chat_id = ("-1001854584771")
@@ -158,7 +161,6 @@ def main():
     dp.add_handler(CommandHandler("gm", gm_command))
     dp.add_handler(MessageHandler(Filters.text, check_gm))
     dp.add_error_handler(error_handler)
-    dp.add_handler(CommandHandler("200", quote_command1))
     
     jq = JobQueue()
     jq.set_dispatcher(dp)
@@ -180,7 +182,6 @@ def main():
    
     jq.start()
 
-    # Fetch group members
     chat_id = ("-1001854584771")
     all_users = fetch_group_members(dp.bot, chat_id)
 
@@ -192,7 +193,6 @@ def main():
     dp.add_error_handler(error_handler)
 
     updater.start_polling()
-    # updater = Updater(api_token, use_context=True, workers=4)
     updater.idle()
 
 if __name__ == '__main__':
