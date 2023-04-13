@@ -138,6 +138,15 @@ Er dachte, er fände hier das Paradies,
 Aber es war Malta, und Malta war ok."""
     context.bot.send_message(chat_id=chat_id, text=message)
 
+def calculate_first_run_time(random_weekday, random_hour, random_minute, timezone):
+    now = datetime.datetime.now(timezone)
+    days_ahead = random_weekday - now.weekday()
+    if days_ahead < 0:
+        days_ahead += 7
+    first_run_time = now + datetime.timedelta(days=days_ahead)
+    first_run_time = first_run_time.replace(hour=random_hour, minute=random_minute, second=0, microsecond=0)
+    return first_run_time
+    
 def main():
     global all_users
     api_token = ("REDACTED_TELEGRAM_TOKEN")
@@ -162,15 +171,13 @@ def main():
     jq.run_daily(send_poem, time=datetime.time(hour=22, tzinfo=timezone))
     jq.run_repeating(mention_everyone, interval=datetime.timedelta(hours=1), first=datetime.time(hour=12, tzinfo=timezone))
     
-    # Zufällige Stunde und Minute auswählen
+    random_weekday = random.randint(0, 6)
     random_hour = random.randint(0, 23)
     random_minute = random.randint(0, 59)
+    first_run_time = calculate_first_run_time(random_weekday, random_hour, random_minute, timezone)
 
-    # Wähle einen Wochentag (0 = Montag, 1 = Dienstag, ..., 6 = Sonntag)
-    random_weekday = random.randint(0, 6)
-
-    jq.run_weekly(send_random_message, day=random_weekday, time=datetime.time(hour=random_hour, minute=random_minute, tzinfo=timezone))
-    
+    jq.run_repeating(send_random_message, interval=datetime.timedelta(weeks=1), first=first_run_time)
+   
     jq.start()
 
     # Fetch group members
