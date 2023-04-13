@@ -114,31 +114,31 @@ def lift_command(update: Update, context: CallbackContext):
 def quote_command1(update: Update, context: CallbackContext):
     chat_id = ("-1001854584771")
     quote = """\
-I have found the Iron to be my greatest friend. 
-It never freaks out on me, never runs. 
-Friends may come and go.
-
+I have found the Iron to be my greatest friend. <br>
+It never freaks out on me, never runs. <br>
+Friends may come and go. <br><br>
 But two hundred pounds is always two hundred pounds."""
-    context.bot.send_message(chat_id=chat_id, text=quote, parse_mode='MarkdownV2')
+    context.bot.send_message(chat_id=chat_id, text=quote, parse_mode='HTML')
 
 def send_random_message(context: CallbackContext):
     chat_id = ("-1001854584771")
     message = """\
-Im Labyrinth der Seele wandert Michael,
-Verloren, suchend, wie ein Schatten blind,
-Zerfurcht sein Herz, sein Geist noch unbeständig,
-Ein junger Mann, der seinen Weg nicht findet.
-
-Der Lebensstürme wilder Tanz umhüllt ihn,
-Zerrt ihn hinfort, verweht die Hoffnung fein,
-Die Qual der Wahl, die Schatten seiner Zweifel,
-Lähmen seinen Geist, gefangen im Sein.
-
-Und schließlich kommt er an, am Rand der Welt,
-Ein kleines Land, von blauem Meer umspült,
-Er dachte, er fände hier das Paradies,
+Im Labyrinth der Seele wandert Michael, <br>
+Verloren, suchend, wie ein Schatten blind, <br>
+Zerfurcht sein Herz, sein Geist noch unbeständig, <br>
+Ein junger Mann, der seinen Weg nicht findet. <br><br>
+Der Lebensstürme wilder Tanz umhüllt ihn, <br>
+Zerrt ihn hinfort, verweht die Hoffnung fein, <br>
+Die Qual der Wahl, die Schatten seiner Zweifel, <br>
+Lähmen seinen Geist, gefangen im Sein. <br><br>
+Und schließlich kommt er an, am Rand der Welt, <br>
+Ein kleines Land, von blauem Meer umspült, <br>
+Er dachte, er fände hier das Paradies, <br>
 Aber es war Malta, und Malta war ok."""
-    context.bot.send_message(chat_id=chat_id, text=quote, parse_mode='MarkdownV2')
+    context.bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
+
+def nako_command(update: Update, context: CallbackContext):
+    send_random_message(context)
 
 def calculate_first_run_time(random_weekday, random_hour, random_minute, timezone):
     now = datetime.datetime.now(timezone)
@@ -160,6 +160,7 @@ def main():
     dp.add_handler(CommandHandler("gm", gm_command))
     dp.add_handler(MessageHandler(Filters.text, check_gm))
     dp.add_handler(CommandHandler("rollins", quote_command1))
+    dp.add_handler(CommandHandler("nako", nako_command))
     dp.add_error_handler(error_handler)
     
     jq = updater.job_queue
