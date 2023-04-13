@@ -112,11 +112,11 @@ def lift_command(update: Update, context: CallbackContext):
 def quote_command1(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     quote = """\
-    I have found the Iron to be my greatest friend. 
-    It never freaks out on me, never runs. 
-    Friends may come and go. 
-    
-    But two hundred pounds is always two hundred pounds."""
+I have found the Iron to be my greatest friend. 
+It never freaks out on me, never runs. 
+Friends may come and go. 
+
+But two hundred pounds is always two hundred pounds."""
     context.bot.send_message(chat_id=chat_id, text=quote)
     
 def send_random_message(context: CallbackContext):
