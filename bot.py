@@ -1,5 +1,6 @@
 import datetime
 import os
+import random
 from collections import defaultdict
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext, JobQueue, MessageHandler, Filters
@@ -75,7 +76,7 @@ def check_all_gm_sent(context):
     missing_users = all_users.difference(set(gm_users.keys()))
 
     if not missing_users:
-        context.bot.send_message(chat_id=chat_id, text="EUCH AUCH EINEN GUTEN MORGEN")
+        context.bot.send_message(chat_id=chat_id, text="EUCH AUCH EINEN GUTEN MORGEN!")
     else:
         message = "Fehlende GM-Nachrichten von: " + ", ".join([f"@{user}" for user in missing_users])
         context.bot.send_message(chat_id=chat_id, text=message)
@@ -107,6 +108,35 @@ def lift_command(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id=chat_id, text=message_text, parse_mode='Markdown')
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Bitte geben Sie eine Nachricht nach dem /lift Befehl ein.")
+        
+ def quote_command1(update: Update, context: CallbackContext):
+    chat_id = update.effective_chat.id
+    quote = """\
+    I have found the Iron to be my greatest friend. 
+    It never freaks out on me, never runs. 
+    Friends may come and go. 
+    
+    But two hundred pounds is always two hundred pounds."""
+    context.bot.send_message(chat_id=chat_id, text=quote)
+    
+def send_random_message(context: CallbackContext):
+    chat_id = ("-1001854584771")
+    message = """\
+Im Labyrinth der Seele wandert Michael,
+Verloren, suchend, wie ein Schatten blind,
+Zerfurcht sein Herz, sein Geist noch unbeständig,
+Ein junger Mann, der seinen Weg nicht findet.
+
+Der Lebensstürme wilder Tanz umhüllt ihn,
+Zerrt ihn hinfort, verweht die Hoffnung fein,
+Die Qual der Wahl, die Schatten seiner Zweifel,
+Lähmen seinen Geist, gefangen im Sein.
+
+Und schließlich kommt er an, am Rand der Welt,
+Ein kleines Land, von blauem Meer umspült,
+Er dachte, er fände hier das Paradies,
+Aber es war Malta, und Malta war ok."""
+    context.bot.send_message(chat_id=chat_id, text=message)
 
 def main():
     global all_users
@@ -119,7 +149,7 @@ def main():
     dp.add_handler(CommandHandler("gm", gm_command))
     dp.add_handler(MessageHandler(Filters.text, check_gm))
     dp.add_error_handler(error_handler)
-    
+    dp.add_handler(CommandHandler("200", quote_command1))
     
     jq = JobQueue()
     jq.set_dispatcher(dp)
@@ -132,6 +162,15 @@ def main():
     jq.run_daily(send_poem, time=datetime.time(hour=22, tzinfo=timezone))
     jq.run_repeating(mention_everyone, interval=datetime.timedelta(hours=1), first=datetime.time(hour=12, tzinfo=timezone))
     
+    # Zufällige Stunde und Minute auswählen
+    random_hour = random.randint(0, 23)
+    random_minute = random.randint(0, 59)
+
+    # Wähle einen Wochentag (0 = Montag, 1 = Dienstag, ..., 6 = Sonntag)
+    random_weekday = random.randint(0, 6)
+
+    jq.run_weekly(send_random_message, day=random_weekday, time=datetime.time(hour=random_hour, minute=random_minute, tzinfo=timezone))
+    
     jq.start()
 
     # Fetch group members
@@ -142,7 +181,7 @@ def main():
     dp.add_handler(CommandHandler("gm", gm_command))
     dp.add_handler(MessageHandler(Filters.text, check_gm))
     dp.add_handler(CommandHandler("lift", lift_command))
-
+    dp.add_handler(CommandHandler("200", quote_command1))
     dp.add_error_handler(error_handler)
 
     updater.start_polling()
