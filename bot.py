@@ -112,7 +112,7 @@ def lift_command(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id=update.effective_chat.id, text="Bitte geben Sie eine Nachricht nach dem /lift Befehl ein.")
         
 def quote_command1(update: Update, context: CallbackContext):
-    chat_id = update.effective_chat.id
+    chat_id = ("-1001854584771")
     quote = """\
 I have found the Iron to be my greatest friend. 
 It never freaks out on me, never runs. 
