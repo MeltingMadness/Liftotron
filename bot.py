@@ -116,12 +116,11 @@ def quote_command1(update: Update, context: CallbackContext):
     quote = """\
 I have found the Iron to be my greatest friend. 
 It never freaks out on me, never runs. 
-Friends may come and go. 
-    
-But two hundred pounds is always two hundred pounds."""
-    context.bot.send_message(chat_id=chat_id, text=quote)
+Friends may come and go.
 
-    
+But two hundred pounds is always two hundred pounds."""
+    context.bot.send_message(chat_id=chat_id, text=quote, parse_mode='MarkdownV2')
+
 def send_random_message(context: CallbackContext):
     chat_id = ("-1001854584771")
     message = """\
@@ -139,7 +138,7 @@ Und schließlich kommt er an, am Rand der Welt,
 Ein kleines Land, von blauem Meer umspült,
 Er dachte, er fände hier das Paradies,
 Aber es war Malta, und Malta war ok."""
-    context.bot.send_message(chat_id=chat_id, text=message)
+    context.bot.send_message(chat_id=chat_id, text=quote, parse_mode='MarkdownV2')
 
 def calculate_first_run_time(random_weekday, random_hour, random_minute, timezone):
     now = datetime.datetime.now(timezone)
@@ -184,12 +183,6 @@ def main():
 
     chat_id = ("-1001854584771")
     all_users = fetch_group_members(dp.bot, chat_id)
-
-    dp.add_handler(CommandHandler("start", start_command))
-    dp.add_handler(CommandHandler("gm", gm_command))
-    dp.add_handler(MessageHandler(Filters.text, check_gm))
-    dp.add_handler(CommandHandler("lift", lift_command))
-    dp.add_error_handler(error_handler)
 
     updater.start_polling()
     updater.idle()
