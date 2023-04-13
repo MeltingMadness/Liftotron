@@ -112,6 +112,7 @@ def lift_command(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id=update.effective_chat.id, text="Bitte geben Sie eine Nachricht nach dem /lift Befehl ein.")
         
 def quote_command1(update: Update, context: CallbackContext):
+    print("quote_command1 aufgerufen")
     chat_id = ("-1001854584771")
     quote = """\
 I have found the Iron to be my greatest friend. <br>
@@ -138,6 +139,7 @@ Aber es war Malta, und Malta war ok."""
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
 
 def nako_command(update: Update, context: CallbackContext):
+    print("nako_command aufgerufen")
     send_random_message(context)
 
 def calculate_first_run_time(random_weekday, random_hour, random_minute, timezone):
