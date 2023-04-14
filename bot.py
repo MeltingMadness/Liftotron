@@ -152,6 +152,7 @@ def calculate_first_run_time(random_weekday, random_hour, random_minute, timezon
     return first_run_time
     
 def main():
+    print("Bot startet...")
     global all_users
     api_token = ("REDACTED_TELEGRAM_TOKEN")
     updater = Updater(api_token, use_context=True)
@@ -161,8 +162,8 @@ def main():
     dp.add_handler(CommandHandler("lift", lift_command))
     dp.add_handler(CommandHandler("gm", gm_command))
     dp.add_handler(MessageHandler(Filters.text, check_gm))
-    dp.add_handler(CommandHandler("rollins", quote_command1))
-    dp.add_handler(CommandHandler("nako", nako_command))
+    dp.add_handler(CommandHandler("rollins", quote_command1, run_async=True))
+    dp.add_handler(CommandHandler("nako", nako_command, run_async=True))
     dp.add_error_handler(error_handler)
     
     jq = updater.job_queue
