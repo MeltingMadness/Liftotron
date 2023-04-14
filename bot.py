@@ -150,6 +150,9 @@ def calculate_first_run_time(random_weekday, random_hour, random_minute, timezon
     first_run_time = now + datetime.timedelta(days=days_ahead)
     first_run_time = first_run_time.replace(hour=random_hour, minute=random_minute, second=0, microsecond=0)
     return first_run_time
+
+def command_debug(update: Update, context: CallbackContext):
+    print(f"Command: {update.message.text}")
     
 def main():
     print("Bot startet...")
@@ -172,6 +175,8 @@ def main():
     print("nako_command registriert")
     dp.add_error_handler(error_handler)
     print("error_handler registriert")
+    dp.add_handler(MessageHandler(Filters.command, command_debug))
+    dp.add_error_handler(error_handler)
     
     jq = updater.job_queue
 
