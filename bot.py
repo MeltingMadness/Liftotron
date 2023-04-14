@@ -37,7 +37,7 @@ def reset_gm_users(context):
 def send_gm(context):
     chat_id = ("-1001854584771")
     context.bot.send_message(chat_id=chat_id, text="GM")
-    gif_url = "https://media3.giphy.com/media/2IxtjutFAGLfdI1GvK/giphy.gif"
+    gif_url = "https://media.tenor.com/y1n4lM9lR_kAAAAM/take-no.gif"
     context.bot.send_animation(chat_id=chat_id, animation=gif_url)
 
 
