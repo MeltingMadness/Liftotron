@@ -159,12 +159,19 @@ def main():
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start_command))
+    print("start_command registriert")
     dp.add_handler(CommandHandler("lift", lift_command))
+    print("lift_command registriert")
     dp.add_handler(CommandHandler("gm", gm_command))
+    print("gm_command registriert")
     dp.add_handler(MessageHandler(Filters.text, check_gm))
+    print("check_gm registriert")
     dp.add_handler(CommandHandler("rollins", quote_command1, run_async=True))
+    print("quote_command1 registriert")
     dp.add_handler(CommandHandler("nako", nako_command, run_async=True))
+    print("nako_command registriert")
     dp.add_error_handler(error_handler)
+    print("error_handler registriert")
     
     jq = updater.job_queue
 
@@ -189,7 +196,9 @@ def main():
     all_users = fetch_group_members(dp.bot, chat_id)
 
     updater.start_polling()
+    print("Bot gestartet und Polling")
     updater.idle()
+    print("Bot beendet")
 
 if __name__ == '__main__':
     main()
