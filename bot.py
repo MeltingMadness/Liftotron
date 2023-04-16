@@ -96,8 +96,15 @@ def mention_everyone(context: CallbackContext):
     now = datetime.datetime.now(pytz.timezone("Europe/Berlin"))
     if now.weekday() == 6 and now.hour == 12:  # Check if it's Sunday and 12:00
         chat_id = ("-1001854584771")
-        mention_list = " ".join([f"@{user}" for user in all_users])
-        context.bot.send_message(chat_id=chat_id, text=f"Es ist Sonntag! Check-In nicht vergessen! {mention_list}")
+        # Make sure the fetched users are up-to-date
+        global all_users
+        all_users = fetch_group_members(context.bot, chat_id)
+        mention_list = " ".join([f"@{user}" for user in all_users if user])  # Filter out any None values
+        if mention_list:
+            context.bot.send_message(chat_id=chat_id, text=f"Es ist Sonntag! Check-In nicht vergessen! {mention_list}")
+        else:
+            context.bot.send_message(chat_id=chat_id, text=f"Es ist Sonntag! Check-In nicht vergessen!")
+
 
     
 def lift_command(update: Update, context: CallbackContext):
