@@ -98,7 +98,7 @@ GN."""
     
 def mention_everyone(context: CallbackContext):
     now = datetime.datetime.now(pytz.timezone("Europe/Berlin"))
-        if now.weekday() == 6 and now.hour == 12:  # Check if it's Sunday and 12:00
+    if now.weekday() == 6 and now.hour == 12:  # Check if it's Sunday and 12:00
         chat_id = ("-1001854584771")
         # Make sure the fetched users are up-to-date
         global all_users
