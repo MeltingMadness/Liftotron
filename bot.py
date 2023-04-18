@@ -133,9 +133,9 @@ But two hundred pounds is always two hundred pounds."""
 def nako_command(update: Update, context: CallbackContext):
     print("nako_command aufgerufen")
     chat_id = update.effective_chat.id
-    send_random_message(context, chat_id)
+    send_random_message_for_nako(context, chat_id)
 
-def send_random_message(context: CallbackContext, chat_id):
+def send_random_message_for_nako(context: CallbackContext, chat_id):
     message = """\
 Im Labyrinth der Seele wandert Michael, \n
 Verloren, suchend, wie ein Schatten blind, \n
@@ -151,6 +151,9 @@ Er dachte, er fände hier das Paradies, \n
 Aber es war Malta, und Malta war ok."""
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
 
+def send_random_message(context: CallbackContext):
+    chat_id = ("-1001854584771")
+    # Rest of the function remains the same
 
 def calculate_first_run_time(random_weekday, random_hour, random_minute, timezone):
     now = datetime.datetime.now(timezone)
