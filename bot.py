@@ -98,7 +98,7 @@ GN."""
     
 def mention_everyone(context: CallbackContext):
     now = datetime.datetime.now(pytz.timezone("Europe/Berlin"))
-    if now.weekday() == 6 and now.hour == 12:  # Check if it's Sunday and 12:00
+        if now.weekday() == 6 and now.hour == 12:  # Check if it's Sunday and 12:00
         chat_id = ("-1001854584771")
         # Make sure the fetched users are up-to-date
         global all_users
@@ -109,8 +109,6 @@ def mention_everyone(context: CallbackContext):
         else:
             context.bot.send_message(chat_id=chat_id, text=f"Es ist Sonntag! Check-In nicht vergessen!")
 
-
-    
 def lift_command(update: Update, context: CallbackContext):
     print("lift_command aufgerufen")
     chat_id = ("-1001854584771")
@@ -121,7 +119,7 @@ def lift_command(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id=chat_id, text=message_text, parse_mode='Markdown')
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Bitte geben Sie eine Nachricht nach dem /lift Befehl ein.")
-        
+
 def quote_command1(update: Update, context: CallbackContext):
     print("quote_command1 aufgerufen")
     chat_id = ("-1001854584771")
