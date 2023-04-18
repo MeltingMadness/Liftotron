@@ -130,26 +130,27 @@ Friends may come and go. <br><br>
 But two hundred pounds is always two hundred pounds."""
     context.bot.send_message(chat_id=chat_id, text=quote, parse_mode='HTML')
 
-def send_random_message(context: CallbackContext):
-    chat_id = ("-1001854584771")
+def nako_command(update: Update, context: CallbackContext):
+    print("nako_command aufgerufen")
+    chat_id = update.effective_chat.id
+    send_random_message(context, chat_id)
+
+def send_random_message(context: CallbackContext, chat_id):
     message = """\
-Im Labyrinth der Seele wandert Michael, <br>
-Verloren, suchend, wie ein Schatten blind, <br>
-Zerfurcht sein Herz, sein Geist noch unbeständig, <br>
-Ein junger Mann, der seinen Weg nicht findet. <br><br>
-Der Lebensstürme wilder Tanz umhüllt ihn, <br>
-Zerrt ihn hinfort, verweht die Hoffnung fein, <br>
-Die Qual der Wahl, die Schatten seiner Zweifel, <br>
-Lähmen seinen Geist, gefangen im Sein. <br><br>
-Und schließlich kommt er an, am Rand der Welt, <br>
-Ein kleines Land, von blauem Meer umspült, <br>
-Er dachte, er fände hier das Paradies, <br>
+Im Labyrinth der Seele wandert Michael, \n
+Verloren, suchend, wie ein Schatten blind, \n
+Zerfurcht sein Herz, sein Geist noch unbeständig, \n
+Ein junger Mann, der seinen Weg nicht findet. \n\n
+Der Lebensstürme wilder Tanz umhüllt ihn, \n
+Zerrt ihn hinfort, verweht die Hoffnung fein, \n
+Die Qual der Wahl, die Schatten seiner Zweifel, \n
+Lähmen seinen Geist, gefangen im Sein. \n\n
+Und schließlich kommt er an, am Rand der Welt, \n
+Ein kleines Land, von blauem Meer umspült, \n
+Er dachte, er fände hier das Paradies, \n
 Aber es war Malta, und Malta war ok."""
     context.bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
 
-def nako_command(update: Update, context: CallbackContext):
-    print("nako_command aufgerufen")
-    send_random_message(context)
 
 def calculate_first_run_time(random_weekday, random_hour, random_minute, timezone):
     now = datetime.datetime.now(timezone)
