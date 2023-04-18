@@ -79,6 +79,8 @@ def check_all_gm_sent(context):
 
     if not missing_users:
         context.bot.send_message(chat_id=chat_id, text="EUCH AUCH EINEN GUTEN MORGEN!")
+        photo_url = "https://picr.eu/images/2023/04/18/FpnQl.jpg"
+        context.bot.send_photo(chat_id=chat_id, photo=photo_url)
     else:
         message = "Fehlende GM-Nachrichten von: " + ", ".join([f"@{user}" for user in missing_users])
         context.bot.send_message(chat_id=chat_id, text=message)
@@ -91,6 +93,8 @@ Muskeln wachsen, Kraft erwacht,
 Körper formen sich.
 GN."""
     context.bot.send_message(chat_id=chat_id, text=poem)
+    photo_url = "https://picr.eu/images/2023/04/18/Fp87k.jpg"
+    context.bot.send_photo(chat_id=chat_id, photo=photo_url)
     
 def mention_everyone(context: CallbackContext):
     now = datetime.datetime.now(pytz.timezone("Europe/Berlin"))
