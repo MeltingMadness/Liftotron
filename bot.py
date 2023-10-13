@@ -136,18 +136,18 @@ def quote_command1(update: Update, context: CallbackContext):
             "Friends may come and go.\n\n" \
             "But two hundred pounds is always two hundred pounds."
     try:
-        context.bot.send_message(chat_id=chat_id, text=quote)
+        context.bot.send_message(chat_id = ("-1001854584771"), text=quote, parse_mode='MarkdownV2')
     except Exception as e:
         logger.error(f"Error in quote_command1: {e}")
 
 def nako_command(update: Update, context: CallbackContext):
     print("nako_command aufgerufen")
-    chat_id = update.effective_chat.id
+    chat_id = ("-1001854584771")
     send_random_message_for_nako(context, chat_id)
 
 def nako_command(update: Update, context: CallbackContext):
     logger.info("nako_command called")
-    chat_id = update.effective_chat.id
+    chat_id = ("-1001854584771")
     message = "Im Labyrinth der Seele wandert Michael,\n" \
               "Verloren, suchend, wie ein Schatten blind,\n" \
               "Zerfurcht sein Herz, sein Geist noch unbeständig,\n" \
@@ -161,7 +161,7 @@ def nako_command(update: Update, context: CallbackContext):
               "Er dachte, er fände hier das Paradies,\n" \
               "Aber es war Malta, und Malta war ok."
     try:
-        context.bot.send_message(chat_id=chat_id, text=message)
+        context.bot.send_message(chat_id = ("-1001854584771"), text=message, parse_mode='MarkdownV2')
     except Exception as e:
         logger.error(f"Error in nako_command: {e}")
 
