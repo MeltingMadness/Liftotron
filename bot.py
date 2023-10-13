@@ -180,7 +180,7 @@ def main():
     print("Bot is starting...")
     
     # Initialize your bot, dispatcher, and job queue
-    updater = Updater("YOUR_API_KEY", use_context=True)
+    updater = Updater("5805275775:AAHGYsqX7dW9pUme8jFKT97xy-i29z5qHfo", use_context=True)
     dp = updater.dispatcher
     jq = updater.job_queue
 
