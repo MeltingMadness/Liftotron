@@ -129,39 +129,38 @@ def lift_command(update: Update, context: CallbackContext):
 
 
 def quote_command1(update: Update, context: CallbackContext):
-    logger.info("quote_command1 called")
     chat_id = ("-1001854584771")
-    quote = "I have found the Iron to be my greatest friend.\n" \
-            "It never freaks out on me, never runs.\n" \
-            "Friends may come and go.\n\n" \
-            "But two hundred pounds is always two hundred pounds."
+    quote = """\
+I have found the Iron to be my greatest friend.
+It never freaks out on me, never runs.
+Friends may come and go.
+But two hundred pounds is always two hundred pounds."""
     try:
-        context.bot.send_message(chat_id = ("-1001854584771"), text=quote, parse_mode='MarkdownV2')
+        context.bot.send_message(chat_id = ("-1001854584771"), text=quote)
     except Exception as e:
         logger.error(f"Error in quote_command1: {e}")
 
-def nako_command(update: Update, context: CallbackContext):
-    print("nako_command aufgerufen")
-    chat_id = ("-1001854584771")
-    send_random_message_for_nako(context, chat_id)
 
 def nako_command(update: Update, context: CallbackContext):
-    logger.info("nako_command called")
-    chat_id = ("-1001854584771")
-    message = "Im Labyrinth der Seele wandert Michael,\n" \
-              "Verloren, suchend, wie ein Schatten blind,\n" \
-              "Zerfurcht sein Herz, sein Geist noch unbeständig,\n" \
-              "Ein junger Mann, der seinen Weg nicht findet.\n\n" \
-              "Der Lebensstürme wilder Tanz umhüllt ihn,\n" \
-              "Zerrt ihn hinfort, verweht die Hoffnung fein,\n" \
-              "Die Qual der Wahl, die Schatten seiner Zweifel,\n" \
-              "Lähmen seinen Geist, gefangen im Sein.\n\n" \
-              "Und schließlich kommt er an, am Rand der Welt,\n" \
-              "Ein kleines Land, von blauem Meer umspült,\n" \
-              "Er dachte, er fände hier das Paradies,\n" \
-              "Aber es war Malta, und Malta war ok."
     try:
-        context.bot.send_message(chat_id = ("-1001854584771"), text=message, parse_mode='MarkdownV2')
+        chat_id = update.effective_chat.id
+        message = """\
+Im Labyrinth der Seele wandert Michael,
+Verloren, suchend, wie ein Schatten blind,
+Zerfurcht sein Herz, sein Geist noch unbeständig,
+Ein junger Mann, der seinen Weg nicht findet.
+
+Der Lebensstürme wilder Tanz umhüllt ihn,
+Zerrt ihn hinfort, verweht die Hoffnung fein,
+Die Qual der Wahl, die Schatten seiner Zweifel,
+Lähmen seinen Geist, gefangen im Sein.
+
+Und schließlich kommt er an, am Rand der Welt,
+Ein kleines Land, von blauem Meer umspült,
+Er dachte, er fände hier das Paradies,
+Aber es war Malta, und Malta war ok."""
+
+        context.bot.send_message(chat_id=chat_id, text=message)
     except Exception as e:
         logger.error(f"Error in nako_command: {e}")
 
