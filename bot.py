@@ -180,7 +180,7 @@ def main():
     print("Bot is starting...")
     
     # Initialize your bot, dispatcher, and job queue
-    updater = Updater("YOUR_API_KEY", use_context=True)
+    updater = Updater("REDACTED_TELEGRAM_TOKEN", use_context=True)
     dp = updater.dispatcher
     jq = updater.job_queue
 
