@@ -1,38 +1,43 @@
 import datetime
 import os
 import random
+import logging
 from collections import defaultdict
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 from telegram.error import (TelegramError, Unauthorized, BadRequest, 
                             TimedOut, ChatMigrated, NetworkError)
-
 import pytz
 
-gm_users = defaultdict(bool)
-all_users = set()
+# Initialize logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                     level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-def fetch_group_members(bot, chat_id):
-    all_members = set()
-    offset = 0
-    limit = 200
+class BotState:
+    def __init__(self):
+        self.gm_users = defaultdict(bool)
+        self.all_users = set()
 
-    while True:
-        try:
-            chat_member = bot.get_chat_member(chat_id=chat_id, user_id=offset)
-            username = chat_member.user.username
-            if username:
-                all_members.add(username)
+    def fetch_group_members(self, bot, chat_id):
+        all_members = set()
+        offset = 0
+        limit = 200
 
-            offset += 1
-        except Exception as e:
-            break
+        while True:
+            try:
+                chat_member = bot.get_chat_member(chat_id=chat_id, user_id=offset)
+                username = chat_member.user.username
+                if username:
+                    all_members.add(username)
 
-    return all_members
+                offset += 1
+            except Exception as e:
+                break
 
+        self.all_users = all_members
 
-def reset_gm_users(context):
-    gm_users.clear()
+bot_state = BotState()
 
 def send_gm(context):
     chat_id = ("-1001854584771")
@@ -41,22 +46,15 @@ def send_gm(context):
     context.bot.send_animation(chat_id=chat_id, animation=gif_url)
 
 
+def reset_gm_users(context):
+    global bot_state
+    bot_state.gm_users.clear()
+
 def error_handler(update: Update, context: CallbackContext):
     try:
         raise context.error
-    except Unauthorized:
+    except (Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError):
         pass
-    except BadRequest:
-        pass
-    except TimedOut:
-        pass
-    except NetworkError:
-        pass
-    except ChatMigrated as e:
-        pass
-    except TelegramError:
-        pass
-
 def gm_command(update: Update, context: CallbackContext):
     send_gm(context)
 
@@ -73,10 +71,16 @@ def check_gm(update: Update, context: CallbackContext):
             gm_users[user_name] = True
 
 def check_all_gm_sent(context):
-    global all_users
+    global bot_state
     chat_id = ("-1001854584771")
-    missing_users = all_users.difference(set(gm_users.keys()))
 
+    logger.info(f"all_users: {bot_state.all_users}")
+    logger.info(f"gm_users.keys(): {set(bot_state.gm_users.keys())}")
+
+    bot_state.fetch_group_members(context.bot, chat_id)
+    
+    missing_users = bot_state.all_users.difference(set(bot_state.gm_users.keys()))
+    
     if not missing_users:
         context.bot.send_message(chat_id=chat_id, text="EUCH AUCH EINEN GUTEN MORGEN!")
         photo_url = "https://picr.eu/images/2023/04/18/FpnQl.jpg"
@@ -84,6 +88,7 @@ def check_all_gm_sent(context):
     else:
         message = "Fehlende GM-Nachrichten von: " + ", ".join([f"@{user}" for user in missing_users])
         context.bot.send_message(chat_id=chat_id, text=message)
+
 
 def send_poem(context):
     chat_id = ("-1001854584771")
@@ -114,11 +119,14 @@ def lift_command(update: Update, context: CallbackContext):
     chat_id = ("-1001854584771")
     message_text = update.message.text.partition(' ')[2]
     print(f"message_text: {message_text}")
+    # Replace newline characters with Markdown-compatible line breaks
     message_text = message_text.replace('\n', '  \n')
     if message_text:
-        context.bot.send_message(chat_id=chat_id, text=message_text, parse_mode='Markdown')
+        # Use MarkdownV2 as the parse_mode
+        context.bot.send_message(chat_id=chat_id, text=message_text, parse_mode='MarkdownV2')
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Bitte geben Sie eine Nachricht nach dem /lift Befehl ein.")
+
 
 def quote_command1(update: Update, context: CallbackContext):
     print("quote_command1 aufgerufen")
@@ -168,55 +176,34 @@ def command_debug(update: Update, context: CallbackContext):
     print(f"Command: {update.message.text}")
     
 def main():
-    print("Bot startet...")
-    global all_users
-    api_token = ("REDACTED_TELEGRAM_TOKEN")
-    updater = Updater(api_token, use_context=True)
-    dp = updater.dispatcher
-
-    dp.add_handler(CommandHandler("start", start_command))
-    print("start_command registriert")
-    dp.add_handler(CommandHandler("lift", lift_command))
-    print("lift_command registriert")
-    dp.add_handler(CommandHandler("gm", gm_command))
-    print("gm_command registriert")
-    dp.add_handler(MessageHandler(Filters.text, check_gm))
-    print("check_gm registriert")
-    dp.add_handler(CommandHandler("rollins", quote_command1))
-    print("quote_command1 registriert")
-    dp.add_handler(CommandHandler("nako", nako_command))
-    print("nako_command registriert")
-    dp.add_error_handler(error_handler)
-    print("error_handler registriert")
-    dp.add_handler(MessageHandler(Filters.command, command_debug))
-    dp.add_error_handler(error_handler)
+    # Main code here
+    print("Bot is starting...")
     
+    # Initialize your bot, dispatcher, and job queue
+    updater = Updater("YOUR_API_KEY", use_context=True)
+    dp = updater.dispatcher
     jq = updater.job_queue
 
-    # Zeitzone festlegen
+    dp.add_handler(CommandHandler("start", start_command))
+    dp.add_handler(CommandHandler("lift", lift_command))
+    dp.add_handler(CommandHandler("gm", gm_command))
+    dp.add_handler(MessageHandler(Filters.text, check_gm))
+    dp.add_handler(CommandHandler("rollins", quote_command1))
+    dp.add_handler(CommandHandler("nako", nako_command))
+    dp.add_error_handler(error_handler)
+
+    # Timezone
     timezone = pytz.timezone('Europe/Berlin')
+
+    # Schedule jobs
     jq.run_daily(send_gm, time=datetime.time(hour=5, tzinfo=timezone))
     jq.run_daily(reset_gm_users, time=datetime.time(hour=0, tzinfo=timezone))
     jq.run_daily(check_all_gm_sent, time=datetime.time(hour=9, tzinfo=timezone))
     jq.run_daily(send_poem, time=datetime.time(hour=22, tzinfo=timezone))
-    jq.run_repeating(mention_everyone, interval=datetime.timedelta(hours=1), first=datetime.time(hour=12, tzinfo=timezone))
-    
-    random_weekday = random.randint(0, 6)
-    random_hour = random.randint(0, 23)
-    random_minute = random.randint(0, 59)
-    first_run_time = calculate_first_run_time(random_weekday, random_hour, random_minute, timezone)
-
-    jq.run_repeating(send_random_message, interval=datetime.timedelta(weeks=1), first=first_run_time)
-   
-    jq.start()
-
-    chat_id = ("-1001854584771")
-    all_users = fetch_group_members(dp.bot, chat_id)
 
     updater.start_polling()
-    print("Bot gestartet und Polling")
     updater.idle()
-    print("Bot beendet")
 
 if __name__ == '__main__':
     main()
+
