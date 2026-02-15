@@ -1,0 +1,20 @@
+0dea074 (HEAD -> main, origin/main, origin/HEAD) Create bot2.py
+5a64c56 Update bot.py
+83cf4bb Update bot.py
+c140f3e Update bot.py
+414bc25 Update bot.py
+307976e Update bot.py
+8a77ca1 Update bot.py
+981ccbd Update bot.py
+42bc373 Update bot.py
+caf0532 Update bot.py
+b7062a9 Update bot.py
+e29500a Update bot.py
+3823948 Update bot.py
+377b6e3 Update bot.py
+e60e57e Update bot.py
+e984f24 Update bot.py
+ae01722 Update bot.py
+c05f110 Update bot.py
+ae6a944 Update bot.py
+2182a53 Update bot.py

@@ -1,0 +1,4 @@
+has-readme=False
+has-requirements=False
+has-pyproject=False
+has-github-workflows=False

@@ -1,0 +1,6 @@
+py-compile=0
+ruff-check=1
+mypy-check=1
+bandit-check=1
+pip-audit=1
+safety-scan=1

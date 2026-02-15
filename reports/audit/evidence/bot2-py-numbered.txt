@@ -1,0 +1,278 @@
+﻿   1: import datetime
+   2: import os
+   3: import random
+   4: import logging
+   5: from collections import defaultdict
+   6: 
+   7: import pytz
+   8: from telegram import Update
+   9: from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
+  10: from telegram.error import (TelegramError, Unauthorized, BadRequest,
+  11:                             TimedOut, ChatMigrated, NetworkError)
+  12: 
+  13: # Initialize logging
+  14: logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+  15:                     level=logging.INFO)
+  16: logger = logging.getLogger(__name__)
+  17: 
+  18: # Konstanten (wie Chat-ID und Token) bleiben hardcodiert, wie gewÃ¼nscht
+  19: CHAT_ID = "-1001854584771"
+  20: BOT_TOKEN = "<REDACTED_TELEGRAM_TOKEN>"
+  21: 
+  22: class BotState:
+  23:     def __init__(self):
+  24:         # Speichert, welche User bereits ihre GM gesendet haben (username: bool)
+  25:         self.gm_users = defaultdict(bool)
+  26:         # Speichert bekannte User des Chats (z.â€¯B. Admins und alle, die interagiert haben)
+  27:         self.all_users = set()
+  28: 
+  29:     def fetch_group_members(self, bot, chat_id):
+  30:         """
+  31:         Versucht, Ã¼ber get_chat_administrators (und ggf. andere Quellen) bekannte
+  32:         Mitglieder abzurufen und in self.all_users zu speichern.
+  33:         Aufgrund von EinschrÃ¤nkungen der Telegram API wird hier nur eine Teilmenge
+  34:         (z.â€¯B. Administratoren) erfasst.
+  35:         """
+  36:         try:
+  37:             admins = bot.get_chat_administrators(chat_id)
+  38:             for admin in admins:
+  39:                 username = admin.user.username
+  40:                 if username:
+  41:                     self.all_users.add(username)
+  42:         except Exception as e:
+  43:             logger.error("Fehler beim Abrufen der Chat-Administratoren: %s", e)
+  44:         # Hinweis: ZusÃ¤tzlich fÃ¼gen wir in check_gm alle Nutzer hinzu, die interagieren.
+  45: 
+  46: # Initialer Zustand des Bots
+  47: bot_state = BotState()
+  48: 
+  49: 
+  50: def send_gm(context: CallbackContext):
+  51:     """
+  52:     Sendet die tÃ¤gliche GM-Nachricht (und eine Animation) an den Chat.
+  53:     """
+  54:     context.bot.send_message(chat_id=CHAT_ID, text="GM")
+  55:     gif_url = "https://media.tenor.com/y1n4lM9lR_kAAAAM/take-no.gif"
+  56:     context.bot.send_animation(chat_id=CHAT_ID, animation=gif_url)
+  57: 
+  58: 
+  59: def reset_gm_users(context: CallbackContext):
+  60:     """
+  61:     Setzt die Liste der GM-senden Nutzer zurÃ¼ck.
+  62:     """
+  63:     bot_state.gm_users.clear()
+  64:     logger.info("GM-Status wurde zurÃ¼ckgesetzt.")
+  65: 
+  66: 
+  67: def error_handler(update: Update, context: CallbackContext):
+  68:     """
+  69:     Zentrale Fehlerbehandlung: Loggt Fehler und unterdrÃ¼ckt bekannte Ausnahmen.
+  70:     """
+  71:     try:
+  72:         raise context.error
+  73:     except (Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError) as e:
+  74:         logger.error("TelegramError: %s", e)
+  75: 
+  76: 
+  77: def gm_command(update: Update, context: CallbackContext):
+  78:     """
+  79:     /gm-Befehl: LÃ¶st die GM-Aktion aus.
+  80:     """
+  81:     send_gm(context)
+  82: 
+  83: 
+  84: def start_command(update: Update, context: CallbackContext):
+  85:     """
+  86:     /start-Befehl: BegrÃ¼ÃŸt den Nutzer.
+  87:     """
+  88:     chat_id = update.effective_chat.id
+  89:     context.bot.send_message(chat_id=chat_id, text="ham ham lecker eisen")
+  90: 
+  91: 
+  92: def check_gm(update: Update, context: CallbackContext):
+  93:     """
+  94:     ÃœberprÃ¼ft, ob der Nachrichteninhalt "gm" (unabhÃ¤ngig von GroÃŸ-/Kleinschreibung)
+  95:     lautet. Falls ja, wird der User als 'GM gesendet' markiert und in die all_users-Liste aufgenommen.
+  96:     """
+  97:     if update.message is not None:
+  98:         user = update.message.from_user
+  99:         username = user.username
+ 100:         message_text = update.message.text
+ 101: 
+ 102:         if message_text.lower() == "gm" and username:
+ 103:             bot_state.gm_users[username] = True
+ 104:             # ErgÃ¤nzt all_users mit jedem, der interagiert â€“ so kennen wir zumindest aktive User
+ 105:             bot_state.all_users.add(username)
+ 106:             logger.info("User @%s hat gm gesendet.", username)
+ 107: 
+ 108: 
+ 109: def check_all_gm_sent(context: CallbackContext):
+ 110:     """
+ 111:     Um 09:00 Uhr wird geprÃ¼ft, ob alle bekannten Nutzer (in bot_state.all_users)
+ 112:     ihre GM-Nachricht gesendet haben. Bei vollstÃ¤ndiger Beteiligung wird ein GruÃŸ inklusive Foto gesendet,
+ 113:     andernfalls eine Liste der fehlenden Nutzer.
+ 114:     """
+ 115:     logger.info("Bekannte User: %s", bot_state.all_users)
+ 116:     logger.info("GM-User: %s", set(bot_state.gm_users.keys()))
+ 117: 
+ 118:     # Aktualisiere die bekannten User (z. B. aus der Admin-Liste)
+ 119:     bot_state.fetch_group_members(context.bot, CHAT_ID)
+ 120: 
+ 121:     missing_users = bot_state.all_users.difference(set(bot_state.gm_users.keys()))
+ 122: 
+ 123:     if not missing_users:
+ 124:         context.bot.send_message(chat_id=CHAT_ID, text="EUCH AUCH EINEN GUTEN MORGEN!")
+ 125:         photo_url = "https://picr.eu/images/2023/04/18/FpnQl.jpg"
+ 126:         context.bot.send_photo(chat_id=CHAT_ID, photo=photo_url)
+ 127:     else:
+ 128:         message = "Fehlende GM-Nachrichten von: " + ", ".join([f"@{user}" for user in missing_users])
+ 129:         context.bot.send_message(chat_id=CHAT_ID, text=message)
+ 130: 
+ 131: 
+ 132: def send_poem(context: CallbackContext):
+ 133:     """
+ 134:     Sendet abends ein Gedicht zusammen mit einem Bild.
+ 135:     """
+ 136:     poem = (
+ 137:         "Stahl in den HÃ¤nden,\n"
+ 138:         "Muskeln wachsen, Kraft erwacht,\n"
+ 139:         "KÃ¶rper formen sich.\n"
+ 140:         "GN."
+ 141:     )
+ 142:     context.bot.send_message(chat_id=CHAT_ID, text=poem)
+ 143:     photo_url = "https://picr.eu/images/2023/04/18/Fp87k.jpg"
+ 144:     context.bot.send_photo(chat_id=CHAT_ID, photo=photo_url)
+ 145: 
+ 146: 
+ 147: def mention_everyone(context: CallbackContext):
+ 148:     """
+ 149:     Beispiel-Funktion, die (falls benÃ¶tigt) alle bekannten User erwÃ¤hnt.
+ 150:     Beachten Sie, dass hier nur die in bot_state.all_users gespeicherten Nutzer erwÃ¤hnt werden.
+ 151:     """
+ 152:     now = datetime.datetime.now(pytz.timezone("Europe/Berlin"))
+ 153:     if now.weekday() == 6 and now.hour == 12:  # Sonntag, 12:00
+ 154:         # Aktualisiere bekannte User (z. B. Admins)
+ 155:         bot_state.fetch_group_members(context.bot, CHAT_ID)
+ 156:         mention_list = " ".join([f"@{user}" for user in bot_state.all_users if user])
+ 157:         if mention_list:
+ 158:             context.bot.send_message(chat_id=CHAT_ID, text=f"Es ist Sonntag! Check-In nicht vergessen! {mention_list}")
+ 159:         else:
+ 160:             context.bot.send_message(chat_id=CHAT_ID, text=f"Es ist Sonntag! Check-In nicht vergessen!")
+ 161: 
+ 162: 
+ 163: def lift_command(update: Update, context: CallbackContext):
+ 164:     """
+ 165:     /lift-Befehl: Sendet eine Nachricht (mÃ¶glicherweise als "Lift"-Message) an den Chat.
+ 166:     Der Text wird als MarkdownV2 formatiert.
+ 167:     """
+ 168:     logger.info("lift_command aufgerufen")
+ 169:     message_text = update.message.text.partition(' ')[2]
+ 170:     logger.info("Nachrichtentext: %s", message_text)
+ 171:     # Ersetze ZeilenumbrÃ¼che durch Markdown-kompatible ZeilenumbrÃ¼che
+ 172:     message_text = message_text.replace('\n', '  \n')
+ 173:     if message_text:
+ 174:         try:
+ 175:             context.bot.send_message(chat_id=CHAT_ID, text=message_text, parse_mode='MarkdownV2')
+ 176:         except Exception as e:
+ 177:             logger.error("Fehler in lift_command: %s", e)
+ 178:     else:
+ 179:         context.bot.send_message(chat_id=update.effective_chat.id,
+ 180:                                  text="Bitte geben Sie eine Nachricht nach dem /lift Befehl ein.")
+ 181: 
+ 182: 
+ 183: def quote_command1(update: Update, context: CallbackContext):
+ 184:     """
+ 185:     /rollins-Befehl: Sendet ein fest vorgegebenes Zitat.
+ 186:     """
+ 187:     quote = (
+ 188:         "I have found the Iron to be my greatest friend.\n"
+ 189:         "It never freaks out on me, never runs.\n"
+ 190:         "Friends may come and go.\n"
+ 191:         "But two hundred pounds is always two hundred pounds."
+ 192:     )
+ 193:     try:
+ 194:         context.bot.send_message(chat_id=CHAT_ID, text=quote)
+ 195:     except Exception as e:
+ 196:         logger.error("Error in quote_command1: %s", e)
+ 197: 
+ 198: 
+ 199: def nako_command(update: Update, context: CallbackContext):
+ 200:     """
+ 201:     /nako-Befehl: Sendet einen vorgefertigten poetischen Text.
+ 202:     """
+ 203:     message = (
+ 204:         "Im Labyrinth der Seele wandert Michael,\n"
+ 205:         "Verloren, suchend, wie ein Schatten blind,\n"
+ 206:         "Zerfurcht sein Herz, sein Geist noch unbestÃ¤ndig,\n"
+ 207:         "Ein junger Mann, der seinen Weg nicht findet.\n\n"
+ 208:         "Der LebensstÃ¼rme wilder Tanz umhÃ¼llt ihn,\n"
+ 209:         "Zerrt ihn hinfort, verweht die Hoffnung fein,\n"
+ 210:         "Die Qual der Wahl, die Schatten seiner Zweifel,\n"
+ 211:         "LÃ¤hmen seinen Geist, gefangen im Sein.\n\n"
+ 212:         "Und schlieÃŸlich kommt er an, am Rand der Welt,\n"
+ 213:         "Ein kleines Land, von blauem Meer umspÃ¼lt,\n"
+ 214:         "Er dachte, er fÃ¤nde hier das Paradies,\n"
+ 215:         "Aber es war Malta, und Malta war ok."
+ 216:     )
+ 217:     try:
+ 218:         chat_id = update.effective_chat.id
+ 219:         context.bot.send_message(chat_id=chat_id, text=message)
+ 220:     except Exception as e:
+ 221:         logger.error("Error in nako_command: %s", e)
+ 222: 
+ 223: 
+ 224: def calculate_first_run_time(random_weekday, random_hour, random_minute, timezone):
+ 225:     """
+ 226:     Berechnet den Zeitpunkt fÃ¼r den ersten Job-Lauf, basierend auf einem zufÃ¤lligen
+ 227:     Wochentag und einer zufÃ¤lligen Uhrzeit im angegebenen Zeitzonen-Kontext.
+ 228:     """
+ 229:     now = datetime.datetime.now(timezone)
+ 230:     days_ahead = random_weekday - now.weekday()
+ 231:     if days_ahead < 0:
+ 232:         days_ahead += 7
+ 233:     first_run_time = now + datetime.timedelta(days=days_ahead)
+ 234:     first_run_time = first_run_time.replace(hour=random_hour, minute=random_minute, second=0, microsecond=0)
+ 235:     return first_run_time
+ 236: 
+ 237: 
+ 238: def command_debug(update: Update, context: CallbackContext):
+ 239:     """
+ 240:     Einfacher Debug-Befehl, der den empfangenen Befehl in der Konsole ausgibt.
+ 241:     """
+ 242:     logger.info("Command received: %s", update.message.text)
+ 243: 
+ 244: 
+ 245: def main():
+ 246:     logger.info("Bot wird gestartet...")
+ 247:     updater = Updater(BOT_TOKEN, use_context=True)
+ 248:     dp = updater.dispatcher
+ 249:     jq = updater.job_queue
+ 250: 
+ 251:     # Handler fÃ¼r Befehle und Nachrichten
+ 252:     dp.add_handler(CommandHandler("start", start_command))
+ 253:     dp.add_handler(CommandHandler("lift", lift_command))
+ 254:     dp.add_handler(CommandHandler("gm", gm_command))
+ 255:     dp.add_handler(CommandHandler("rollins", quote_command1))
+ 256:     dp.add_handler(CommandHandler("nako", nako_command))
+ 257:     dp.add_handler(CommandHandler("debug", command_debug))
+ 258:     dp.add_handler(MessageHandler(Filters.text, check_gm))
+ 259:     dp.add_error_handler(error_handler)
+ 260: 
+ 261:     # Zeitzone: Europe/Berlin
+ 262:     timezone = pytz.timezone('Europe/Berlin')
+ 263: 
+ 264:     # Geplante Jobs:
+ 265:     jq.run_daily(send_gm, time=datetime.time(hour=5, tzinfo=timezone))
+ 266:     jq.run_daily(reset_gm_users, time=datetime.time(hour=0, tzinfo=timezone))
+ 267:     jq.run_daily(check_all_gm_sent, time=datetime.time(hour=9, tzinfo=timezone))
+ 268:     jq.run_daily(send_poem, time=datetime.time(hour=22, tzinfo=timezone))
+ 269:     # Falls gewÃ¼nscht, kann mention_everyone ebenfalls als Job eingereiht werden:
+ 270:     # jq.run_daily(mention_everyone, time=datetime.time(hour=12, minute=0, tzinfo=timezone))
+ 271: 
+ 272:     updater.start_polling()
+ 273:     updater.idle()
+ 274: 
+ 275: 
+ 276: if __name__ == '__main__':
+ 277:     main()
+

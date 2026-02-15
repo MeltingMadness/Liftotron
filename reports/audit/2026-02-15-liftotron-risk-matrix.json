@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-02-15T00:00:00Z",
+  "scope": "liftotron",
+  "dimensions": [
+    {
+      "dimension": "Security",
+      "risk_level": "red",
+      "open_critical": 2,
+      "open_major": 2,
+      "notes": "Credential exposure in source and history plus missing authorization and unsafe Markdown input handling."
+    },
+    {
+      "dimension": "Correctness",
+      "risk_level": "yellow",
+      "open_critical": 0,
+      "open_major": 1,
+      "notes": "bot.py contains unresolved names and broken references that can fail at runtime."
+    },
+    {
+      "dimension": "Reliability",
+      "risk_level": "yellow",
+      "open_critical": 0,
+      "open_major": 2,
+      "notes": "Error handling is brittle and member-tracking model can produce false completeness/omissions."
+    },
+    {
+      "dimension": "Maintainability",
+      "risk_level": "yellow",
+      "open_critical": 0,
+      "open_major": 1,
+      "notes": "Two divergent bot implementations raise regression risk and increase change cost."
+    },
+    {
+      "dimension": "Operability",
+      "risk_level": "yellow",
+      "open_critical": 0,
+      "open_major": 1,
+      "notes": "Missing runbook and CI governance artifacts limit safe operations and onboarding."
+    },
+    {
+      "dimension": "Supply Chain",
+      "risk_level": "red",
+      "open_critical": 0,
+      "open_major": 2,
+      "notes": "No deterministic dependency manifest and known vulnerabilities in tested dependency graph."
+    }
+  ],
+  "overall": {
+    "status": "Red",
+    "rule_applied": "At least one unmitigated critical finding remains open.",
+    "open_critical_total": 2,
+    "open_major_total": 9
+  }
+}

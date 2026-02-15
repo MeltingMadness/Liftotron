@@ -1,0 +1,258 @@
+{
+  "generated_at": "2026-02-15T00:00:00Z",
+  "scope": "liftotron",
+  "commit": "0dea07420e1e499a90d84b371fa84b175e11c0d6",
+  "findings": [
+    {
+      "id": "LFT-SEC-001",
+      "file": "bot.py",
+      "line": 184,
+      "category": "security/secrets",
+      "severity": "critical",
+      "likelihood": "high",
+      "impact": "high",
+      "confidence": "high",
+      "evidence": [
+        "reports/audit/evidence/secret-scan-working-tree.txt",
+        "reports/audit/evidence/handler-scheduler-map.txt"
+      ],
+      "repro_steps": [
+        "Run regex scan for Telegram token pattern against bot.py and bot2.py.",
+        "Confirm token pattern hit in source file(s)."
+      ],
+      "recommendation": "Rotate all exposed Telegram tokens immediately and move runtime secrets to environment variables or secret manager.",
+      "owner": "repo-owner",
+      "target_date": "2026-02-16"
+    },
+    {
+      "id": "LFT-SEC-002",
+      "file": "git-history",
+      "line": 1,
+      "category": "security/secrets",
+      "severity": "critical",
+      "likelihood": "high",
+      "impact": "high",
+      "confidence": "high",
+      "evidence": [
+        "reports/audit/evidence/secret-scan-history.txt"
+      ],
+      "repro_steps": [
+        "Scan git history patch stream for Telegram token pattern.",
+        "Confirm multiple historical token hits."
+      ],
+      "recommendation": "After rotation, rewrite history only if policy requires it; in all cases assume compromise and invalidate old credentials.",
+      "owner": "repo-owner",
+      "target_date": "2026-02-16"
+    },
+    {
+      "id": "LFT-SEC-003",
+      "file": "bot2.py",
+      "line": 252,
+      "category": "security/authz",
+      "severity": "major",
+      "likelihood": "high",
+      "impact": "medium",
+      "confidence": "high",
+      "evidence": [
+        "reports/audit/evidence/handler-scheduler-map.txt"
+      ],
+      "repro_steps": [
+        "Inspect command handlers and verify absence of user/chat allowlist checks.",
+        "Observe /lift and /gm can be triggered without authorization logic."
+      ],
+      "recommendation": "Add explicit allowlist checks for chat_id and allowed user IDs before executing broadcast-capable handlers.",
+      "owner": "repo-owner",
+      "target_date": "2026-02-18"
+    },
+    {
+      "id": "LFT-SEC-004",
+      "file": "bot2.py",
+      "line": 175,
+      "category": "security/input-handling",
+      "severity": "major",
+      "likelihood": "high",
+      "impact": "medium",
+      "confidence": "high",
+      "evidence": [
+        "reports/audit/evidence/handler-scheduler-map.txt",
+        "reports/audit/evidence/bot2-py-numbered.txt"
+      ],
+      "repro_steps": [
+        "Inspect /lift handler and confirm user input is forwarded with parse_mode=MarkdownV2.",
+        "Confirm no escaping/sanitization is applied to user-supplied text."
+      ],
+      "recommendation": "Escape MarkdownV2 special characters or disable Markdown parsing for untrusted input.",
+      "owner": "repo-owner",
+      "target_date": "2026-02-18"
+    },
+    {
+      "id": "LFT-COR-001",
+      "file": "bot.py",
+      "line": 71,
+      "category": "correctness/runtime",
+      "severity": "major",
+      "likelihood": "high",
+      "impact": "high",
+      "confidence": "high",
+      "evidence": [
+        "reports/audit/evidence/ruff-check.txt",
+        "reports/audit/evidence/mypy-check.txt",
+        "reports/audit/evidence/bot-py-numbered.txt"
+      ],
+      "repro_steps": [
+        "Run static analysis (ruff/mypy) on bot.py.",
+        "Confirm undefined names gm_users/fetch_group_members/all_users and type issues."
+      ],
+      "recommendation": "Either retire bot.py or align it with bot2.py and fix all undefined references before use.",
+      "owner": "repo-owner",
+      "target_date": "2026-02-20"
+    },
+    {
+      "id": "LFT-REL-001",
+      "file": "bot.py",
+      "line": 55,
+      "category": "reliability/error-handling",
+      "severity": "major",
+      "likelihood": "medium",
+      "impact": "high",
+      "confidence": "high",
+      "evidence": [
+        "reports/audit/evidence/mypy-check.txt",
+        "reports/audit/evidence/bot-py-numbered.txt",
+        "reports/audit/evidence/bot2-py-numbered.txt"
+      ],
+      "repro_steps": [
+        "Inspect error_handler in both bot.py and bot2.py.",
+        "Confirm raise context.error can fail when context.error is None and non-telegram exceptions are not handled robustly."
+      ],
+      "recommendation": "Replace raise-based flow with guarded logging branch and safe fallback for unknown exceptions.",
+      "owner": "repo-owner",
+      "target_date": "2026-02-20"
+    },
+    {
+      "id": "LFT-REL-002",
+      "file": "bot2.py",
+      "line": 29,
+      "category": "reliability/data-model",
+      "severity": "major",
+      "likelihood": "medium",
+      "impact": "medium",
+      "confidence": "medium",
+      "evidence": [
+        "reports/audit/evidence/bot2-py-numbered.txt"
+      ],
+      "repro_steps": [
+        "Inspect fetch_group_members implementation.",
+        "Confirm only administrators and active senders are discoverable, so all_users is incomplete by design."
+      ],
+      "recommendation": "Define explicit participant roster source or track participant state persistently instead of deriving from admin list plus passive activity.",
+      "owner": "repo-owner",
+      "target_date": "2026-02-22"
+    },
+    {
+      "id": "LFT-SUP-001",
+      "file": "repository-root",
+      "line": 1,
+      "category": "supply-chain/reproducibility",
+      "severity": "major",
+      "likelihood": "high",
+      "impact": "high",
+      "confidence": "high",
+      "evidence": [
+        "reports/audit/evidence/repo-metadata-checks.txt",
+        "reports/audit/evidence/imports-inventory.txt"
+      ],
+      "repro_steps": [
+        "Check for requirements.txt, pyproject.toml, and lock files.",
+        "Confirm dependency manifests are absent."
+      ],
+      "recommendation": "Add deterministic dependency manifest and lock strategy (requirements.txt plus constraints or pyproject + lock).",
+      "owner": "repo-owner",
+      "target_date": "2026-02-19"
+    },
+    {
+      "id": "LFT-SUP-002",
+      "file": "python-deps",
+      "line": 1,
+      "category": "supply-chain/vulnerabilities",
+      "severity": "major",
+      "likelihood": "medium",
+      "impact": "high",
+      "confidence": "high",
+      "evidence": [
+        "reports/audit/evidence/pip-audit.txt",
+        "reports/audit/evidence/venv-freeze.txt"
+      ],
+      "repro_steps": [
+        "Run pip-audit in isolated environment.",
+        "Confirm 6 known vulnerabilities reported for tornado 6.1."
+      ],
+      "recommendation": "Upgrade dependency set to remove vulnerable Tornado versions; verify compatibility with selected python-telegram-bot version.",
+      "owner": "repo-owner",
+      "target_date": "2026-02-19"
+    },
+    {
+      "id": "LFT-MNT-001",
+      "file": "bot.py",
+      "line": 1,
+      "category": "maintainability/duplication",
+      "severity": "major",
+      "likelihood": "high",
+      "impact": "medium",
+      "confidence": "high",
+      "evidence": [
+        "reports/audit/evidence/bot-diff.txt",
+        "reports/audit/evidence/bot-diff-shortstat.txt",
+        "reports/audit/evidence/line-counts.txt"
+      ],
+      "repro_steps": [
+        "Run no-index diff between bot.py and bot2.py.",
+        "Confirm large divergence and overlapping responsibilities."
+      ],
+      "recommendation": "Converge to a single canonical runtime file and remove stale variant after parity verification.",
+      "owner": "repo-owner",
+      "target_date": "2026-02-24"
+    },
+    {
+      "id": "LFT-OPS-001",
+      "file": "repository-root",
+      "line": 1,
+      "category": "operability/governance",
+      "severity": "major",
+      "likelihood": "high",
+      "impact": "medium",
+      "confidence": "high",
+      "evidence": [
+        "reports/audit/evidence/repo-metadata-checks.txt"
+      ],
+      "repro_steps": [
+        "Check repository metadata and governance artifacts.",
+        "Confirm no README, no CI workflow, and no dependency manifest."
+      ],
+      "recommendation": "Add README runbook, minimal CI checks, and incident-response notes in-repo.",
+      "owner": "repo-owner",
+      "target_date": "2026-02-21"
+    },
+    {
+      "id": "LFT-TST-001",
+      "file": "repository-root",
+      "line": 1,
+      "category": "testability/coverage",
+      "severity": "major",
+      "likelihood": "high",
+      "impact": "medium",
+      "confidence": "high",
+      "evidence": [
+        "reports/audit/evidence/file-inventory.txt",
+        "reports/audit/evidence/repo-metadata-checks.txt"
+      ],
+      "repro_steps": [
+        "Inspect repository for tests and CI test execution.",
+        "Confirm no automated test suite is present."
+      ],
+      "recommendation": "Introduce baseline tests for command handlers, scheduler wiring, and markdown escaping logic.",
+      "owner": "repo-owner",
+      "target_date": "2026-02-23"
+    }
+  ]
+}

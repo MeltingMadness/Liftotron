@@ -1,0 +1,8 @@
+__pycache__\bot2.cpython-314.pyc
+__pycache__\bot.cpython-314.pyc
+bot.py
+bot2.py
+reports\audit\evidence\python-version.txt
+reports\audit\evidence\pip-version.txt
+reports\audit\evidence\git-status.txt
+reports\audit\evidence\git-head.txt

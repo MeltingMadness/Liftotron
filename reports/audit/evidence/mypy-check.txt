@@ -1,0 +1,18 @@
+bot2.py:7: error: Library stubs not installed for "pytz"  [import-untyped]
+bot2.py:72: error: Exception must be derived from BaseException  [misc]
+bot2.py:88: error: Item "None" of "Chat | None" has no attribute "id"  [union-attr]
+bot2.py:179: error: Item "None" of "Chat | None" has no attribute "id"  [union-attr]
+bot2.py:218: error: Item "None" of "Chat | None" has no attribute "id"  [union-attr]
+bot.py:10: error: Library stubs not installed for "pytz"  [import-untyped]
+bot.py:10: note: Hint: "python3 -m pip install types-pytz"
+bot.py:10: note: (or run "mypy --install-types" to install all missing stub packages)
+bot.py:10: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
+bot.py:55: error: Exception must be derived from BaseException  [misc]
+bot.py:62: error: Item "None" of "Chat | None" has no attribute "id"  [union-attr]
+bot.py:71: error: Name "gm_users" is not defined  [name-defined]
+bot.py:110: error: Name "all_users" is not defined  [name-defined]
+bot.py:110: error: Name "fetch_group_members" is not defined  [name-defined]
+bot.py:111: error: Name "all_users" is not defined  [name-defined]
+bot.py:128: error: Item "None" of "Chat | None" has no attribute "id"  [union-attr]
+bot.py:146: error: Item "None" of "Chat | None" has no attribute "id"  [union-attr]
+Found 14 errors in 2 files (checked 2 source files)

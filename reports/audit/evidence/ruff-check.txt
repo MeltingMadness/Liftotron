@@ -1,0 +1,124 @@
+F401 [*] `os` imported but unused
+ --> bot.py:2:8
+  |
+1 | import datetime
+2 | import os
+  |        ^^
+3 | import random
+4 | import logging
+  |
+help: Remove unused import: `os`
+
+F401 [*] `random` imported but unused
+ --> bot.py:3:8
+  |
+1 | import datetime
+2 | import os
+3 | import random
+  |        ^^^^^^
+4 | import logging
+5 | from collections import defaultdict
+  |
+help: Remove unused import: `random`
+
+F841 Local variable `limit` is assigned to but never used
+  --> bot.py:25:9
+   |
+23 |         all_members = set()
+24 |         offset = 0
+25 |         limit = 200
+   |         ^^^^^
+26 |
+27 |         while True:
+   |
+help: Remove assignment to unused variable `limit`
+
+F841 [*] Local variable `e` is assigned to but never used
+  --> bot.py:35:33
+   |
+34 |                 offset += 1
+35 |             except Exception as e:
+   |                                 ^
+36 |                 break
+   |
+help: Remove assignment to unused variable `e`
+
+F821 Undefined name `gm_users`
+  --> bot.py:71:13
+   |
+70 |         if message_text.lower() == "gm":
+71 |             gm_users[user_name] = True
+   |             ^^^^^^^^
+72 |
+73 | def check_all_gm_sent(context):
+   |
+
+F821 Undefined name `fetch_group_members`
+   --> bot.py:110:21
+    |
+108 |         # Make sure the fetched users are up-to-date
+109 |         global all_users
+110 |         all_users = fetch_group_members(context.bot, chat_id)
+    |                     ^^^^^^^^^^^^^^^^^^^
+111 |         mention_list = " ".join([f"@{user}" for user in all_users if user])  # Filter out any None values
+112 |         if mention_list:
+    |
+
+F541 [*] f-string without any placeholders
+   --> bot.py:115:60
+    |
+113 |             context.bot.send_message(chat_id=chat_id, text=f"Es ist Sonntag! Check-In nicht vergessen! {mention_list}")
+114 |         else:
+115 |             context.bot.send_message(chat_id=chat_id, text=f"Es ist Sonntag! Check-In nicht vergessen!")
+    |                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+116 |
+117 | def lift_command(update: Update, context: CallbackContext):
+    |
+help: Remove extraneous `f` prefix
+
+F841 Local variable `chat_id` is assigned to but never used
+   --> bot.py:132:5
+    |
+131 | def quote_command1(update: Update, context: CallbackContext):
+132 |     chat_id = ("-1001854584771")
+    |     ^^^^^^^
+133 |     quote = """\
+134 | I have found the Iron to be my greatest friend.
+    |
+help: Remove assignment to unused variable `chat_id`
+
+F401 [*] `os` imported but unused
+ --> bot2.py:2:8
+  |
+1 | import datetime
+2 | import os
+  |        ^^
+3 | import random
+4 | import logging
+  |
+help: Remove unused import: `os`
+
+F401 [*] `random` imported but unused
+ --> bot2.py:3:8
+  |
+1 | import datetime
+2 | import os
+3 | import random
+  |        ^^^^^^
+4 | import logging
+5 | from collections import defaultdict
+  |
+help: Remove unused import: `random`
+
+F541 [*] f-string without any placeholders
+   --> bot2.py:160:60
+    |
+158 |             context.bot.send_message(chat_id=CHAT_ID, text=f"Es ist Sonntag! Check-In nicht vergessen! {mention_list}")
+159 |         else:
+160 |             context.bot.send_message(chat_id=CHAT_ID, text=f"Es ist Sonntag! Check-In nicht vergessen!")
+    |                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: Remove extraneous `f` prefix
+
+Found 11 errors.
+[*] 7 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).

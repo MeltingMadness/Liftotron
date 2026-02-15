@@ -1,0 +1,9 @@
+Found 6 known vulnerabilities in 1 package
+Name    Version ID                  Fix Versions
+------- ------- ------------------- ------------
+tornado 6.1     PYSEC-2023-75       6.3.2
+tornado 6.1     GHSA-qppv-j76h-2rpx 6.3.3
+tornado 6.1     GHSA-753j-mpmx-qq6g 6.4.1
+tornado 6.1     GHSA-w235-7p84-xx57 6.4.1
+tornado 6.1     CVE-2025-47287      6.5
+tornado 6.1     CVE-2024-52804      6.4.2
